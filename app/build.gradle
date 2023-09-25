@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.linphone'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.linphone"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.3'
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${lib.kotlinStdlibJdk7}"
+    api "androidx.core:core-ktx:${lib.ktxVersion}"
+    api "androidx.appcompat:appcompat:${lib.appCompat}"
+    api "androidx.multidex:multidex:${lib.multidex}"
+    api "androidx.recyclerview:recyclerview:${lib.recyclerview}"
+    api "androidx.constraintlayout:constraintlayout:${lib.constraintlayout}"
+    api "androidx.annotation:annotation:${lib.annotation}"
+    api "com.google.android.material:material:${lib.material}"
+}
