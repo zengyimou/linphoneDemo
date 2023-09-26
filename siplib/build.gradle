@@ -59,20 +59,6 @@ android {
         jvmTarget = env.javaVersion
     }
 
-    flavorDimensions.add("channel")
-    productFlavors {
-        nigeria {dimension = "channel"}
-        kenya {dimension = "channel"}
-        mexico {dimension = "channel"}
-        spain {dimension = "channel"}
-        uganda {dimension = "channel"}
-        peru {dimension = "channel"}
-        columbia {dimension = "channel"}
-        chile {dimension = "channel"}
-        ghana {dimension = "channel"}
-        tanzania {dimension = "channel"}
-    }
-
     android.libraryVariants.configureEach { variant ->
         buildConfigField 'String', 'VERSION_NAME', "${version_name}"
         // See https://developer.android.com/studio/releases/gradle-plugin#3-6-0-behavior for why extractNativeLibs is set to true in debug flavor

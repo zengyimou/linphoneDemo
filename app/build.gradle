@@ -39,8 +39,9 @@ android {
 }
 
 dependencies {
-
+    api project(path: ':siplib')
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation project(path: ':siplib')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${lib.kotlinStdlibJdk7}"

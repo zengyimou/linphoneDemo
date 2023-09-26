@@ -98,11 +98,6 @@ object LinphoneConfig {
 			return this
 		}
 
-		fun taskDetailActivityClass(name: Class<*>): Builder {
-			taskDetailActivityClass = name
-			return this
-		}
-
 		fun flavor(f: String): Builder {
 			flavor = f
 			return this
@@ -137,7 +132,6 @@ object LinphoneConfig {
 				outCallClass = outCallClass!!,
 				incomingCallClass = incomingCallClass!!,
 				mainActivityClass = mainActivityClass!!,
-				taskDetailActivityClass = taskDetailActivityClass!!,
 				callingClass = callingClass!!,
 			)
 		}
