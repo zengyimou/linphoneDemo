@@ -1,4 +1,13 @@
 ext {
+    env = [
+            applicationId            : "com.mib.xcredit.xcollect.mix",
+            minSdkVersion            : 23,
+            targetSdkVersion         : 30,
+            compileSdkVersion        : 33,
+            javaVersion              : JavaVersion.VERSION_1_8,
+            buildToolsVersion        : '30.0.3',
+            testInstrumentationRunner: "androidx.test.runner.AndroidJUnitRunner"
+    ]
 
     lib = [
             ktxVersion        : "1.8.0",

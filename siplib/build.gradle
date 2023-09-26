@@ -1,0 +1,99 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+//repositories {
+//    google()
+//    mavenCentral()
+//    maven {
+//        url "https://linphone.org/maven_repository"
+//    }
+//}
+android {
+    def packageName = "com.mib.sip"
+    namespace = packageName
+    compileSdkVersion env.compileSdkVersion
+    buildToolsVersion env.buildToolsVersion
+
+    def version_name = '"1.0"'
+    defaultConfig {
+        minSdkVersion env.minSdkVersion
+        targetSdkVersion env.targetSdkVersion
+        versionCode 1
+        versionName version_name
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    buildTypes {
+        release {
+            debuggable false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "file_provider", packageName + ".fileprovider"
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "file_provider", packageName + ".debug.fileprovider"
+        }
+        debugDev {
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "file_provider", packageName + ".debug.fileprovider"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = env.javaVersion
+    }
+
+    flavorDimensions.add("channel")
+    productFlavors {
+        nigeria {dimension = "channel"}
+        kenya {dimension = "channel"}
+        mexico {dimension = "channel"}
+        spain {dimension = "channel"}
+        uganda {dimension = "channel"}
+        peru {dimension = "channel"}
+        columbia {dimension = "channel"}
+        chile {dimension = "channel"}
+        ghana {dimension = "channel"}
+        tanzania {dimension = "channel"}
+    }
+
+    android.libraryVariants.configureEach { variant ->
+        buildConfigField 'String', 'VERSION_NAME', "${version_name}"
+        // See https://developer.android.com/studio/releases/gradle-plugin#3-6-0-behavior for why extractNativeLibs is set to true in debug flavor
+        if (variant.buildType.name == "release") {
+            variant.getMergedFlavor().manifestPlaceholders = [linphone_address_mime_type: "vnd.android.cursor.item/vnd." + packageName + ".provider.sip_address",
+                                                              linphone_file_provider: packageName + ".fileprovider",
+                                                              ]
+        } else {
+            variant.getMergedFlavor().manifestPlaceholders = [linphone_address_mime_type: "vnd.android.cursor.item/vnd." + packageName + ".provider.sip_address",
+                                                              linphone_file_provider: packageName + ".debug.fileprovider",
+                                                              ]
+        }
+    }
+
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:${lib.appCompat}"
+    implementation "androidx.security:security-crypto-ktx:1.1.0-alpha06"
+
+    api "androidx.multidex:multidex:${lib.multidex}"
+    api "org.linphone:linphone-sdk-android:5.2.97"
+    implementation 'androidx.media:media:1.6.0'
+}

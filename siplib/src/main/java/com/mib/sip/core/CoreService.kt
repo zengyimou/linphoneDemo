@@ -1,0 +1,126 @@
+/*
+     * Copyright (c) 2010-2020 Belledonne Communications SARL.
+ *
+ * This file is part of linphone-android
+ * (see https://www.linphone.org).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.mib.sip.core
+
+import android.content.Intent
+import com.mib.sip.LinphoneContext
+import com.mib.sip.LinphoneContext.coreContext
+import com.mib.sip.LinphoneContext.corePreferences
+import com.mib.sip.LinphoneContext.ensureCoreExists
+import com.mib.sip.logger.Logger
+import org.linphone.core.tools.service.CoreService
+
+class CoreService : CoreService() {
+    override fun onCreate() {
+        super.onCreate()
+        Logger.i("CoreService","[Service] Created")
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Logger.i("CoreService","[Service] Starting, ensuring Core exists")
+
+        if (corePreferences.keepServiceAlive) {
+            Logger.i("CoreService","[Service] Starting as foreground to keep app alive in background")
+            val contextCreated = ensureCoreExists(
+                applicationContext,
+                pushReceived = false,
+                service = this,
+                useAutoStartDescription = false
+            )
+            if (!contextCreated) {
+                // Only start foreground notification if context already exists, otherwise context will do it itself
+                coreContext.notificationsManager.startForeground(this, false)
+            }
+        } else if (intent?.extras?.get("StartForeground") == true) {
+            Logger.i("CoreService","[Service] Starting as foreground due to device boot or app update")
+            val contextCreated = ensureCoreExists(
+                applicationContext,
+                pushReceived = false,
+                service = this,
+                useAutoStartDescription = true,
+                skipCoreStart = true
+            )
+            if (contextCreated) {
+                coreContext.start()
+            } else {
+                // Only start foreground notification if context already exists, otherwise context will do it itself
+                coreContext.notificationsManager.startForeground(this, true)
+            }
+            coreContext.checkIfForegroundServiceNotificationCanBeRemovedAfterDelay(5000)
+        } else {
+            ensureCoreExists(
+                applicationContext,
+                pushReceived = false,
+                service = this,
+                useAutoStartDescription = false
+            )
+        }
+
+        coreContext.notificationsManager.serviceCreated(this)
+
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun createServiceNotificationChannel() {
+        // Done elsewhere
+    }
+
+    override fun showForegroundServiceNotification() {
+        Logger.i("CoreService","[Service] Starting service as foreground")
+        coreContext.notificationsManager.startCallForeground(this)
+    }
+
+    override fun hideForegroundServiceNotification() {
+        Logger.i("CoreService","[Service] Stopping service as foreground")
+        coreContext.notificationsManager.stopCallForeground()
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        if (LinphoneContext.contextExists()) {
+            if (coreContext.core.callsNb > 0) {
+                Logger.w("CoreService",
+                    "[Service] Task removed but there is at least one active call, do not stop the Core!"
+                )
+            } else if (!corePreferences.keepServiceAlive) {
+                if (coreContext.core.isInBackground) {
+                    Logger.i("CoreService","[Service] Task removed, stopping Core")
+                    coreContext.stop()
+                } else {
+                    Logger.w("CoreService","[Service] Task removed but Core is not in background, skipping")
+                }
+            } else {
+                Logger.i("CoreService",
+                    "[Service] Task removed but we were asked to keep the service alive, so doing nothing"
+                )
+            }
+        }
+
+        super.onTaskRemoved(rootIntent)
+    }
+
+    override fun onDestroy() {
+        if (LinphoneContext.contextExists()) {
+            Logger.i("CoreService","[Service] Stopping")
+            coreContext.notificationsManager.serviceDestroyed()
+        }
+
+        super.onDestroy()
+    }
+}

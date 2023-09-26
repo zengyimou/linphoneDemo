@@ -10,8 +10,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        jcenter()
+        maven { url "https://linphone.org/maven_repository" }
     }
 }
 
 rootProject.name = "My Application"
 include ':app'
+include ':siplib'
